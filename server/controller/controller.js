@@ -6,7 +6,7 @@ const mongodb = require("mongodb");
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
-  pass = bcrypt.hashSync(password, 10);
+  let pass = bcrypt.hashSync(password, 10);
   const user = await User.create({ name, email, password: pass });
   if (!user) {
     return res.json({ status: "ko", message: "User not created" });
@@ -21,50 +21,55 @@ const loginUser = async (req, res) => {
     "secret_shhhht",
     { expiresIn: "30d" }
   );
-  //res.json({ status: "ok", token });
-  res.cookie("token", token, {
-    httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  });
+  res
+    .cookie("token", token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    })
+    .json({ status: "ok", user });
   if (!user) {
     return res.json({ status: "ko", message: "User not found" });
   }
   if (!bcrypt.compareSync(password, user.password)) {
     return res.json({ status: "ko", message: "Password not valid" });
   }
+};
+const getUserById = async (req, res) => {
+  const id = req.params.id;
+  const user = await User.findOne({ _id: id });
+  if (!user) {
+    return res.json({ status: "ko", message: err });
+  }
   res.json({ status: "ok", user });
 };
 const getUser = async (req, res) => {
   const users = await User.find({});
-  if (users) {
-    res.json({ status: "ok", users });
+  if (!users) {
+    return res.json({ status: "ko", message: err });
   }
-  res.json({ status: "ko", message: "Users not found" });
+  res.json({ status: "ok", users });
 };
+
 const deleteUser = async (req, res) => {
+  const user = await User.deleteOne({ _id: id });
   const id = req.params.id;
-  const user = await User.deleteOne({ _id: mongoose.Types.ObjectId(id) });
   if (!user) {
-    return res.json({ status: "ko", message: "User not deleted" });
+    return res.json({ status: "ko", message: err });
   }
   res.json({ status: "ok", user });
 };
 
 const updateUser = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params.id;
   const { name, email, password } = req.body;
-  const user = await User.updateOne(
-    { _id: mongoose.Types.ObjectId(id) },
-    { name, email, password }
-  );
+  const user = await User.updateOne({ _id: id }, { name, email, password });
   if (!user) {
     return res.json({ status: "ko", message: err });
   }
   res.json({ status: "ok", user });
 };
 const logoutUser = async (req, res) => {
-  res.clearCookie("token");
-  res.json({ status: "ok" });
+  res.clearCookie("token").json({ status: "ok", message: "Cookie cleared" });
 };
 
 module.exports = {

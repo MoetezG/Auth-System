@@ -11,6 +11,7 @@ const {
   logoutUser,
 } = require("../controller/controller.js");
 const auth = require("../middleware/auth.js");
+
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/", auth, getUser);
