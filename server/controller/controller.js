@@ -21,14 +21,25 @@ const loginUser = async (req, res) => {
     "secret_shhhht",
     { expiresIn: "30d" }
   );
-  res.json({ status: "ok", token });
+  //res.json({ status: "ok", token });
+  res.cookie("token", token, {
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+  if (!user) {
+    return res.json({ status: "ko", message: "User not found" });
+  }
+  if (!bcrypt.compareSync(password, user.password)) {
+    return res.json({ status: "ko", message: "Password not valid" });
+  }
+  res.json({ status: "ok", user });
 };
 const getUser = async (req, res) => {
   const users = await User.find({});
   if (users) {
     res.json({ status: "ok", users });
   }
-  res.json({ status: "ko", message: err });
+  res.json({ status: "ko", message: "Users not found" });
 };
 const deleteUser = async (req, res) => {
   const id = req.params.id;
@@ -52,6 +63,7 @@ const updateUser = async (req, res) => {
   res.json({ status: "ok", user });
 };
 const logoutUser = async (req, res) => {
+  res.clearCookie("token");
   res.json({ status: "ok" });
 };
 
