@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "apicache": "^1.6.3",
+    "express-rate-limit": "^7.3.1",
+    "needle": "^3.3.1"
+  }
+}

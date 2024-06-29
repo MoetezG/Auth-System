@@ -11,10 +11,13 @@ const {
   logoutUser,
 } = require("../controller/controller.js");
 const auth = require("../middleware/auth.js");
+const apicache = require("apicache");
+
+let cache = apicache.middleware;
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/", auth, getUser);
+router.get("/", auth, cache("1 minutes "), getUser);
 router.delete("/:id", auth, deleteUser);
 router.put("/:id", auth, updateUser);
 router.get("/logout", auth, logoutUser);

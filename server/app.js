@@ -3,12 +3,13 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const router = require("./routes/route.js");
 const cors = require("cors");
-const bodyParser = require("body-parser");
+const limiter = require("./middleware/limiter.js");
 
 app = express();
 dotenv.config();
 app.use(cors());
-
+app.use(limiter);
+app.set("trust proxy", 1);
 app.use("/api/user", router);
 
 app.use(express.json());
