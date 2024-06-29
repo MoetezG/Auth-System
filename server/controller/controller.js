@@ -16,6 +16,12 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
+  if (!user) {
+    return res.json({ status: "ko", message: "User not found" });
+  }
+  if (!bcrypt.compareSync(password, user.password)) {
+    return res.json({ status: "ko", message: "Password not valid" });
+  }
   const token = jwt.sign(
     { name: user.name, idUser: user._id },
     "secret_shhhht",
@@ -27,12 +33,6 @@ const loginUser = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
     .json({ status: "ok", user });
-  if (!user) {
-    return res.json({ status: "ko", message: "User not found" });
-  }
-  if (!bcrypt.compareSync(password, user.password)) {
-    return res.json({ status: "ko", message: "Password not valid" });
-  }
 };
 const getUserById = async (req, res) => {
   const id = req.params.id;
