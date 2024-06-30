@@ -4,17 +4,19 @@ const mongoose = require("mongoose");
 const router = require("./routes/route.js");
 const cors = require("cors");
 const limiter = require("./middleware/limiter.js");
-
-app = express();
+const { errorHandler, notFound } = require("./middleware/errotHandler.js");
+const app = express();
 dotenv.config();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
-app.use(limiter);
+
 app.set("trust proxy", 1);
 app.use("/api/user", router);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
+app.use(limiter);
+app.use(notFound);
+app.use(errorHandler);
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -23,6 +25,6 @@ mongoose
       console.log("Server is running...");
     });
   })
-  .catch((err) => {
-    console.error(err);
+  .catch((error) => {
+    throw new Error(error);
   });

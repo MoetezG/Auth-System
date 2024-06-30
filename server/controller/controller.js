@@ -69,6 +69,9 @@ const updateUser = async (req, res) => {
   res.json({ status: "ok", user });
 };
 const logoutUser = async (req, res) => {
+  if (!req.headers.cookie) {
+    return res.json({ status: "ko", message: "token manquant" });
+  }
   res.clearCookie("token").json({ status: "ok", message: "Cookie cleared" });
 };
 

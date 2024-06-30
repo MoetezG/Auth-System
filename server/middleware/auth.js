@@ -17,7 +17,7 @@ function auth(req, res, next) {
     req.idUser = decoded.idUser;
     next();
   } catch (err) {
-    return res.json({ status: "ko", message: "token invalide" });
+    throw new Error(err);
   }
 }
 module.exports = auth;
